@@ -1,26 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "./App.css";
+import "react-datepicker/dist/react-datepicker.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function App() {
+const App: React.FC = () => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h3>Date Picker</h3>
+      <DatePicker
+        selected={selectedDate}
+        onChange={(date: Date | null) => setSelectedDate(date)}
+        className="form-control"
+        placeholderText="MM/DD/YY"
+      />
     </div>
   );
-}
+};
 
 export default App;
