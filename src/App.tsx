@@ -14,7 +14,7 @@ const App: React.FC = () => {
         selected={selectedDate}
         onChange={(date: Date | null) => setSelectedDate(date)}
         className="form-control"
-        placeholderText="MM/DD/YY" ////
+        placeholderText="MM/DD/YY" 
       />
     </div>
   );
