@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/react-datepicker/static/css/main.df870158.css",
+    "main.js": "/react-datepicker/static/js/main.6f012d48.js",
+    "static/js/453.2c783c3e.chunk.js": "/react-datepicker/static/js/453.2c783c3e.chunk.js",
+    "index.html": "/react-datepicker/index.html",
+    "main.df870158.css.map": "/react-datepicker/static/css/main.df870158.css.map",
+    "main.6f012d48.js.map": "/react-datepicker/static/js/main.6f012d48.js.map",
+    "453.2c783c3e.chunk.js.map": "/react-datepicker/static/js/453.2c783c3e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.df870158.css",
+    "static/js/main.6f012d48.js"
+  ]
+}
