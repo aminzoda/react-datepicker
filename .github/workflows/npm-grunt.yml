@@ -16,26 +16,19 @@ jobs:
         node-version: [ 16.x ]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  
+  - name: Checkout code
+    uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+  - name: Install dependencies
+    run: npm install
 
-      - name: Install dependencies
-        run: npm install  # Install project dependencies
+  - name: Build project
+    run: npm run build
 
-      - name: Build project
-        run: npm run build  
-
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          # branch: gh-pages # by default
-          token: ${{ secrets.RW_TOKEN }}
-          folder: ./dist
+  - name: Deploy to GitHub Pages
+    uses: JamesIves/github-pages-deploy-action@v4
+    with:
+      branch: gh-pages
+      folder: dist
 
 
