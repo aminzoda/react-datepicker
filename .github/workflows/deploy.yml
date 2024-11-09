@@ -1,23 +1,22 @@
-name: Deploy to GitHub Pages
+  name: github pages
 
 on:
   push:
     branches:
       - main 
   workflow_dispatch:
-      
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [ 16.x ]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -25,14 +24,15 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install  # Install project dependencies
+      - name: install dependencies
+        run: npm i
 
-      - name: Build gh-pages
-        run: npm run build  # Build the project, make sure this command matches your project
+      - name: build gh-pages
+        run: npm run gh-build
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
-       with:
-        token: ${{ secrets.RW_TOKEN }}
-        folder: ./build
+        with:
+          # branch: gh-pages # by default
+          ssh-key: ${{ secrets.RW_TOKEN }}
+          folder: dist/wayflyer
