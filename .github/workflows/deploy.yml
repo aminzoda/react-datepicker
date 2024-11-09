@@ -3,37 +3,35 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main 
+      - main
   workflow_dispatch:
-      
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        node-version: [ 16.x ]
+        node-version: [16.x]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  
+        uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm install  # Install project dependencies
+        run: npm install
 
       - name: Build project
-        run: npm run build  
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          # branch: gh-pages # by default
           token: ${{ secrets.RW_TOKEN }}
           folder: ./dist
