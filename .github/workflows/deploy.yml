@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main 
+      - main  
 
 jobs:
   deploy:
@@ -23,9 +23,9 @@ jobs:
         npm install
         npm run build  # Assuming you are building a production version of your app in 'build'
 
-    - name: Check repository access (optional)
+    - name: Configure git remote URL
       run: |
-        git remote add origin "https://x-access-token:${{ secrets.RW_TOKEN }}@github.com/aminzoda/react-datepicker.git"
+        git remote set-url origin "https://x-access-token:${{ secrets.RW_TOKEN }}@github.com/aminzoda/react-datepicker.git"
         git fetch origin
         git branch -a
 
@@ -36,4 +36,4 @@ jobs:
         folder: ./build  
         repository-name: aminzoda/react-datepicker  
         target-branch: gh-pages  
-        clean: true  
+        clean: true 
