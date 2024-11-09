@@ -4,35 +4,34 @@ on:
   push:
     branches:
       - main 
-
+  workflow_dispatch:
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
+      - name: Checkout repository
+        uses: actions/checkout@v3  
 
-    - name: Install dependencies
-      run: |
-        npm install
-        npm run build  # Assuming you are building a production version of your app in 'build'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-    - name: Configure git remote URL
-      run: |
-        git remote set-url origin "https://x-access-token:${{ secrets.RW_TOKEN }}@github.com/aminzoda/react-datepicker.git"
-        git fetch origin
-        git branch -a
+      - name: Install dependencies
+        run: npm install  # Install project dependencies
 
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        token: ${{ secrets.RW_TOKEN }}  
-        folder: ./build  
-        repository-name: aminzoda/react-datepicker  
-        clean: true  
+      - name: Build project
+        run: npm run build  
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.RW_TOKEN }}
+          folder: ./build 
