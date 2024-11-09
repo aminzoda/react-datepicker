@@ -3,31 +3,37 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'  # Updated to Node 20 per deprecation warning
-          cache: 'npm'
+    - name: Install dependencies
+      run: |
+        npm install
+        npm run build  # Assuming you are building a production version of your app in 'build'
 
-      - name: Install dependencies
-        run: npm install
+    - name: Check repository access (optional)
+      run: |
+        git remote add origin "https://x-access-token:${{ secrets.RW_TOKEN }}@github.com/aminzoda/react-datepicker.git"
+        git fetch origin
+        git branch -a
 
-      - name: Build project
-        run: npm run build
-
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          token: ${{ secrets.RW_TOKEN }}
-          folder: ./build  # Make sure this matches your actual build output
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        token: ${{ secrets.RW_TOKEN }}
+        folder: ./build  
+        repository-name: aminzoda/react-datepicker  
+        target-branch: gh-pages  
+        clean: true  
