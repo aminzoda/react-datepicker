@@ -1,72 +1,48 @@
 import React, { useState } from "react";
-import { FaCalendarAlt } from "react-icons/fa";
-import Calendar from "./components/Calendar";
 import "./App.css";
 
-const App: React.FC = () => {
-  const [dateInput, setDateInput] = useState("");
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [enteredDate, setEnteredDate] = useState<Date | null>(null);
+export default function ResponsiveDatePickers() {
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDateInput(e.target.value);
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(event.target.value);
   };
 
-  // Handle "Enter" key press to trigger the calendar update
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      const [day, month, year] = dateInput
-        .split("/")
-        .map((item) => parseInt(item, 10));
-
-      if (day && month && year) {
-        const parsedDate = new Date(year, month - 1, day);
-
-        if (!isNaN(parsedDate.getTime())) {
-          setEnteredDate(parsedDate); // Set the entered date
-          setCurrentDate(parsedDate); // Update the current date to the entered date
-          setShowCalendar(true); // Show the calendar
-          setDateInput(""); // Clear the input field after updating the calendar
-        } else {
-          alert("Invalid date. Please use the format DD/MM/YYYY.");
-        }
-      } else {
-        alert("Invalid date. Please use the format DD/MM/YYYY.");
-      }
-    }
-  };
-
-  // Toggle calendar visibility when icon is clicked
-  const handleCalendarClick = () => {
-    setShowCalendar((prev) => !prev);
-    setDateInput("");
+  const handleClick = () => {
+    console.log("Date picker clicked!");
   };
 
   return (
-    <div className="app">
-      <div className="content">
-        <div className="date-input">
-          <input
-            type="text"
-            value={dateInput}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="DD/MM/YYYY"
-            className="input-date"
-          />
-          <FaCalendarAlt
-            className="calendar-icon"
-            onClick={handleCalendarClick}
-          />
-        </div>
-
-        {showCalendar && (
-          <Calendar initialDate={currentDate} enteredDate={enteredDate} />
-        )}
+    <div
+      style={{
+        padding: "20px",
+        fontFamily: "Arial, sans-serif",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ marginBottom: "10px" }}>
+        <label style={{ fontWeight: "bold", alignItems: "center" }}>
+          Date Picker
+        </label>
       </div>
+      <input
+        type="date"
+        value={selectedDate}
+        onChange={handleDateChange}
+        onClick={handleClick}
+        style={{
+          padding: "10px",
+          fontSize: "16px",
+          borderRadius: "4px",
+          border: "1px solid #ccc",
+          maxWidth: "200px",
+        }}
+      />
     </div>
   );
-};
-
-export default App;
+}
