@@ -22,7 +22,7 @@ body {
 }
 
 .date-picker-input {
-  padding: 20px;
+  padding: 24px;
   font-size: 16px;
   border-radius: 4px;
   border: 1px solid #ccc;
@@ -38,6 +38,7 @@ body {
   position: absolute;
   top: 50px;
   left: 50%;
+  width: 336px;
   transform: translateX(-50%);
   background-color: #fff;
   border: 1px solid #ccc;
@@ -52,6 +53,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 10px 0;
   margin-bottom: 10px;
   font-family: "Roboto", sans-serif;
 }
@@ -75,24 +77,35 @@ body {
 
 .date-picker-month,
 .date-picker-year {
-  padding: 5px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  text-align: center;
+  padding: 12px;
   cursor: pointer;
+  border: none;
   max-width: 120px;
+  font-size: 14px;
   font-family: "Roboto", sans-serif;
+}
+
+.date-picker-year:hover,
+.date-picker-month:hover {
+  background: #f0f0f0;
+}
+
+.date-picker-year.selected,
+.date-picker-month.selected {
+  background: #6200ea;
+  color: #fff;
 }
 
 .date-picker-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
+  margin-top: 14px;
 }
 
 .date-picker-weekday {
   text-align: center;
-  font-weight: bold;
   color: #666;
   font-family: "Roboto", sans-serif;
 }
@@ -101,6 +114,7 @@ body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
+  margin-top: 12px;
 }
 
 .date-picker-day {
@@ -131,16 +145,36 @@ body {
 
 .date-picker-input-wrapper {
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
 }
 
 .calendar-icon {
   position: absolute;
-  right: 10px;
+  right: 24px;
   top: 14px;
   cursor: pointer;
   width: 24px;
   height: 24px;
   color: #007bff;
+}
+
+.date-picker-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 6px;
+}
+
+.date-picker-nav {
+  font-size: 20px;
+  padding: 0 10px;
+}
+
+.date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Four items per row */
+  gap: 10px;
+  padding: 10px;
 }

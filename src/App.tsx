@@ -5,7 +5,6 @@ const formatDate = (date: Date): string => {
   const month = date.getMonth() + 1;
   const day = date.getDate();
   const year = date.getFullYear();
-
   return `${month < 10 ? "0" + month : month}/${
     day < 10 ? "0" + day : day
   }/${year}`;
@@ -23,26 +22,16 @@ export default function CustomDatePicker() {
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
   );
+  const [viewMode, setViewMode] = useState<"calendar" | "month" | "year">(
+    "calendar"
+  );
+  const [yearRange, setYearRange] = useState<number[]>([]);
 
   const calendarRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      calendarRef.current &&
-      !calendarRef.current.contains(event.target as Node) &&
-      inputRef.current &&
-      !inputRef.current.contains(event.target as Node)
-    ) {
-      setIsCalendarVisible(false);
-    }
-  };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    const currentYear = new Date().getFullYear();
+    setYearRange(Array.from({ length: 12 }, (_, i) => currentYear - 6 + i));
   }, []);
 
   const generateDays = (year: number, month: number): string[] => {
@@ -60,61 +49,56 @@ export default function CustomDatePicker() {
     setIsCalendarVisible(false);
   };
 
+  const handleMonthSelect = (month: number) => {
+    setSelectedMonth(month);
+    setViewMode("year");
+  };
+
+  const handleYearSelect = (year: number) => {
+    setSelectedYear(year);
+    setViewMode("calendar");
+  };
+
   const toggleCalendar = () => {
     setIsCalendarVisible((prev) => !prev);
+    setViewMode("calendar");
   };
 
-  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMonth(Number(event.target.value));
+  const navigateYearRange = (direction: "prev" | "next") => {
+    setYearRange((prevRange) => {
+      const offset = 12;
+      const newStart =
+        direction === "prev" ? prevRange[0] - offset : prevRange[0] + offset;
+      return Array.from({ length: 12 }, (_, i) => newStart + i);
+    });
   };
 
-  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedYear(Number(event.target.value));
-  };
-
-  const handlePrevMonth = () => {
-    if (selectedMonth === 0) {
-      setSelectedMonth(11);
-      setSelectedYear(selectedYear - 1);
-    } else {
-      setSelectedMonth(selectedMonth - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (selectedMonth === 11) {
-      setSelectedMonth(0);
-      setSelectedYear(selectedYear + 1);
-    } else {
-      setSelectedMonth(selectedMonth + 1);
-    }
+  const navigateMonth = (direction: "prev" | "next") => {
+    setSelectedMonth(
+      (prev) => (direction === "prev" ? prev - 1 : prev + 1) % 12
+    );
   };
 
   const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();
   const daysInMonth = generateDays(selectedYear, selectedMonth);
 
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "Янв",
+    "Фев",
+    "Мар",
+    "Апр",
+    "Май",
+    "Июн",
+    "Июл",
+    "Авг",
+    "Сен",
+    "Окт",
+    "Ноя",
+    "Дек",
   ];
 
-  const years = Array.from(
-    { length: 100 },
-    (_, i) => new Date().getFullYear() - i
-  );
-
   return (
-    <div className="date-picker-container">
+    <div className="date-picker-container" tabIndex={0}>
       <div className="date-picker-input-wrapper">
         <input
           className="date-picker-input"
@@ -122,8 +106,8 @@ export default function CustomDatePicker() {
           value={selectedDate}
           onClick={toggleCalendar}
           readOnly
-          ref={inputRef}
         />
+        {/* Calendar Icon inside the input wrapper */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="#5f6368"
@@ -145,70 +129,120 @@ export default function CustomDatePicker() {
 
       {isCalendarVisible && (
         <div className="date-picker-calendar" ref={calendarRef}>
-          <div className="date-picker-header">
-            <div className="date-picker-month-year">
-              <select
-                className="date-picker-month"
-                value={selectedMonth}
-                onChange={handleMonthChange}
-              >
+          {viewMode === "calendar" && (
+            <>
+              <div className="date-picker-header">
+                <button onClick={() => setViewMode("month")}>
+                  {months[selectedMonth]} {selectedYear}
+                </button>
+                <div>
+                  <button onClick={() => navigateMonth("prev")}>&lt;</button>
+                  <button onClick={() => navigateMonth("next")}>&gt;</button>
+                </div>
+              </div>
+              <hr />
+              <div className="date-picker-weekdays">
+                {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((day) => (
+                  <div key={day} className="date-picker-weekday">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              <div className="date-picker-days">
+                {Array.from({ length: firstDayOfMonth }).map((_, index) => (
+                  <div
+                    key={`empty-${index}`}
+                    className="date-picker-day empty"
+                  ></div>
+                ))}
+                {daysInMonth.map((date) => (
+                  <div
+                    key={date}
+                    className={`date-picker-day ${
+                      date === selectedDate ? "selected" : ""
+                    }`}
+                    onClick={() => handleDateSelect(date)}
+                  >
+                    {new Date(date).getDate()}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {viewMode === "month" && (
+            <>
+              <div className="date-picker-header">
+                <div>
+                  <button onClick={() => setViewMode("year")}>
+                    {months[selectedMonth]}
+                  </button>
+                  <button onClick={() => setViewMode("calendar")}>
+                    {selectedYear}
+                  </button>
+                </div>
+                <div>
+                  <button onClick={() => navigateYearRange("prev")}>
+                    &lt;
+                  </button>
+                  <button onClick={() => navigateYearRange("next")}>
+                    &gt;
+                  </button>
+                </div>
+              </div>
+              <hr />
+              <div className="date-picker-grid">
                 {months.map((month, index) => (
-                  <option key={month} value={index}>
+                  <div
+                    key={month}
+                    className={`date-picker-month ${
+                      index === selectedMonth ? "selected" : ""
+                    }`}
+                    onClick={() => handleMonthSelect(index)}
+                  >
                     {month}
-                  </option>
+                  </div>
                 ))}
-              </select>
+              </div>
+            </>
+          )}
 
-              <select
-                className="date-picker-year"
-                value={selectedYear}
-                onChange={handleYearChange}
-              >
-                {years.map((year) => (
-                  <option key={year} value={year}>
+          {viewMode === "year" && (
+            <>
+              <div className="date-picker-header">
+                <div>
+                  <button onClick={() => setViewMode("month")}>
+                    {months[selectedMonth]}
+                  </button>
+                  <button onClick={() => setViewMode("calendar")}>
+                    {selectedYear}
+                  </button>
+                </div>
+                <div>
+                  <button onClick={() => navigateYearRange("prev")}>
+                    &lt;
+                  </button>
+                  <button onClick={() => navigateYearRange("next")}>
+                    &gt;
+                  </button>
+                </div>
+              </div>
+              <hr />
+              <div className="date-picker-grid">
+                {yearRange.map((year) => (
+                  <div
+                    key={year}
+                    className={`date-picker-year ${
+                      year === selectedYear ? "selected" : ""
+                    }`}
+                    onClick={() => handleYearSelect(year)}
+                  >
                     {year}
-                  </option>
+                  </div>
                 ))}
-              </select>
-            </div>
-            <div>
-              <button onClick={handlePrevMonth} className="date-picker-nav-btn">
-                &lt;
-              </button>
-              <button onClick={handleNextMonth} className="date-picker-nav-btn">
-                &gt;
-              </button>
-            </div>
-          </div>
-
-          <div className="date-picker-weekdays">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div key={day} className="date-picker-weekday">
-                {day}
               </div>
-            ))}
-          </div>
-
-          <div className="date-picker-days">
-            {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-              <div
-                key={`empty-${index}`}
-                className="date-picker-day empty"
-              ></div>
-            ))}
-
-            {daysInMonth.map((day) => (
-              <div
-                key={day}
-                className={`date-picker-day ${
-                  day === selectedDate ? "selected" : ""
-                }`}
-                onClick={() => handleDateSelect(day)}
-              >
-                {new Date(day).getDate()}
-              </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       )}
     </div>
