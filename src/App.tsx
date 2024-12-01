@@ -51,17 +51,29 @@ export default function CustomDatePicker() {
 
   const handleMonthSelect = (month: number) => {
     setSelectedMonth(month);
-    setViewMode("year");
+    setSelectedDate(formatDate(new Date(selectedYear, month, 1)));
+    setViewMode("calendar");
   };
 
   const handleYearSelect = (year: number) => {
     setSelectedYear(year);
+    setSelectedDate(formatDate(new Date(year, selectedMonth, 1)));
     setViewMode("calendar");
   };
 
   const toggleCalendar = () => {
     setIsCalendarVisible((prev) => !prev);
-    setViewMode("calendar");
+    if (!isCalendarVisible) {
+      setViewMode("calendar");
+    }
+  };
+
+  const showMonths = () => {
+    setViewMode("month");
+  };
+
+  const showYears = () => {
+    setViewMode("year");
   };
 
   const navigateYearRange = (direction: "prev" | "next") => {
@@ -74,9 +86,26 @@ export default function CustomDatePicker() {
   };
 
   const navigateMonth = (direction: "prev" | "next") => {
-    setSelectedMonth(
-      (prev) => (direction === "prev" ? prev - 1 : prev + 1) % 12
-    );
+    setSelectedMonth((prev) => {
+      const newMonth = direction === "prev" ? prev - 1 : prev + 1;
+      if (newMonth < 0) {
+        setSelectedYear((prevYear) => prevYear - 1);
+        return 11; // Wrap around to December
+      }
+      if (newMonth > 11) {
+        setSelectedYear((prevYear) => prevYear + 1);
+        return 0; // Wrap around to January
+      }
+      return newMonth;
+    });
+    setSelectedDate((prev) => {
+      const date = new Date(
+        selectedYear,
+        selectedMonth + (direction === "prev" ? -1 : 1),
+        1
+      );
+      return formatDate(date);
+    });
   };
 
   const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();
@@ -107,7 +136,6 @@ export default function CustomDatePicker() {
           onClick={toggleCalendar}
           readOnly
         />
-        {/* Calendar Icon inside the input wrapper */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="#5f6368"
@@ -132,14 +160,16 @@ export default function CustomDatePicker() {
           {viewMode === "calendar" && (
             <>
               <div className="date-picker-header">
-                <button onClick={() => setViewMode("month")}>
-                  {months[selectedMonth]} {selectedYear}
-                </button>
+                <div>
+                  <button onClick={showMonths}>{months[selectedMonth]}</button>
+                  <button onClick={showYears}>{selectedYear}</button>
+                </div>
                 <div>
                   <button onClick={() => navigateMonth("prev")}>&lt;</button>
                   <button onClick={() => navigateMonth("next")}>&gt;</button>
                 </div>
               </div>
+
               <hr />
               <div className="date-picker-weekdays">
                 {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((day) => (
